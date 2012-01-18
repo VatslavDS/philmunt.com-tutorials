@@ -1,0 +1,27 @@
+<html>
+	<body>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script>
+			$(document).ready(function () {
+				var socket = io.connect('http://muntism.org:3000');
+				socket.on('message', function (data) {
+					$('#chat').append(data.text + '<br />');
+				});
+
+				$('#send').click(function () {
+								socket.emit('sendMessage', { text: $('#text').val() });
+								$('#text').val('');
+				});
+
+			});
+		</script>
+
+		<div id="chat" style="width: 500px; height: 300px; border: 1px solid black">
+
+		</div>
+
+		<input type="text" name="text" id="text">
+		<input type="button" name="send" id="send" value="send">
+	</body>
+</html>

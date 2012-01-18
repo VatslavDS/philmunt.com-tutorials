@@ -1,0 +1,97 @@
+<html>
+	<body>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script>
+
+		  $(document).ready(function () {
+				var game_id;
+				var me = 2;
+
+				var socket = io.connect('http://muntism.org:3000');
+
+				socket.emit('requestGame');
+
+				socket.on('noFreeGames', function () {
+					$('#log').append('No free games, creating a new one<br />');
+					socket.emit('createGame');
+				});
+
+
+				socket.on('gameCreated', function (data) {
+					$('#log').append('Free game created, awaiting opponent<br />');
+					game_id = data.game_id;
+					me = 1;
+				});
+
+				socket.on('gameStart', function (data) {
+					game_id = data.game_id;
+					var	my_turn = data.turn;
+
+
+					if (my_turn)
+				       		$('#log').append('Game started, your turn<br />');
+					else
+						$('#log').append('Game started, opponents turn<br />');
+				});
+
+				socket.on('move', function (data) {
+					var square = '#b'+data.square;
+					var value = (data.sign == 1) ? 'O' : 'X';
+
+					$(square).val(value);
+					my_turn = data.turn;
+				});
+
+				socket.on('error', function (data) {
+					alert(data.description);
+				});
+
+				socket.on('gameOver', function (data) {
+					if (data.winner == me)
+						alert('You won!');
+					else if (data.winner == 0)
+						alert('Draw');
+					else
+						alert('You Lost');
+					
+					$('.square').attr('disabled', true);	
+				});
+
+				$('.square').click(function () {
+
+					var square = parseFloat( $(this).attr('id').substr(1) );
+					socket.emit('move', {game_id: game_id, square: square}); 
+				});
+
+			});
+		</script>
+
+		<table>
+			<tbody>
+				<tr>
+
+					<td><input class="square" type="button" value=" " id="b0" /></td>
+					<td><input class="square" type="button" value=" " id="b1" /></td>
+					<td><input class="square" type="button" value=" " id="b2" /></td>
+				</tr>
+
+				<tr>
+					<td><input class="square" type="button" value=" " id="b3" /></td>
+					<td><input class="square" type="button" value=" " id="b4" /></td>
+					<td><input class="square" type="button" value=" " id="b5" /></td>
+				</tr>
+
+				<tr>
+					<td><input class="square" type="button" value=" " id="b6" /></td>
+					<td><input class="square" type="button" value=" " id="b7" /></td>
+					<td><input class="square" type="button" value=" " id="b8" /></td>
+				</tr>
+			</tbody>
+		</table>
+		<br />
+		<div id="log">
+			Requesting a free game <br />
+		</div>
+	</body>
+</html>
