@@ -1,0 +1,53 @@
+<html>
+	<body>
+		<canvas id="nhsg-p4-canvas" width="800" height="600"></canvas>
+
+		<script>    
+			var canvas = document.getElementById('nhsg-p4-canvas');
+			if (canvas.getContext) {
+
+				var MAX_STARS = 250;    
+				var SPEEDS = new Array(1, 2, 4);
+				var COLOURS = new Array('#555', '#aaa', '#fff');
+
+				var ctx = canvas.getContext('2d');
+				var stars = new Array();
+
+				var initializeStars = function () {
+					for (var i=0; i<MAX_STARS; i++) { 
+						var x = Math.floor(Math.random()*canvas.width);
+						var y = Math.floor(Math.random()*canvas.height);
+						var speed = Math.floor(Math.random()*3);
+
+						stars.push({x: x, y: y, speed: speed});
+					}                             
+				}                       
+
+				var updateStars = function () {
+
+					for (var i=0; i<stars.length; i++) {
+						stars[i].y += SPEEDS[stars[i].speed];
+
+						if (stars[i].y >= canvas.height) {  
+							stars[i].y = 0;                           
+							stars[i].x = Math.floor(Math.random()*canvas.width); 
+						}                                   
+					}                             
+
+					ctx.fillStyle = "rgb(0,0,0)"; 
+					ctx.fillRect(0, 0, canvas.width, canvas.height); 
+
+					for (i=0; i<stars.length; i++) {
+						ctx.fillStyle = COLOURS[stars[i].speed];
+						ctx.fillRect(stars[i].x, stars[i].y, 1, 1);
+					}                             
+				}                       
+
+				initializeStars();      
+				setInterval("updateStars()", 30);
+
+			}                 
+		</script>   
+	</body>
+</html>
+~      
